@@ -1,5 +1,6 @@
 import Fuse from 'fuse.js';
 import {emojiList} from '../src/emojiList.js';
+import Quill from "quill";
 
 class TextAreaEmoji {
     constructor(quill){
