@@ -99,13 +99,15 @@ class ShortNameEmoji {
         }, this.handleArrow.bind(this));
 
         quill.keyboard.addBinding({
-            key: 40,  // ArrowRight
+            key: 40,  // ArrowDown
             collapsed: true,
             format: ["emoji"]
         }, this.handleArrow.bind(this));
         // TODO: Add keybindings for Enter (13) and Tab (9) directly on the quill editor
     }
 
+    // todo - clw - add emoji if we are closing a shorthand expression and it matches an emoji
+    // todo - clw - reopen emoji selector if we move the cursor away from an open shorthand expression and then back to it
     onAtKey(range, context) {
         if (this.open) return true;
         if (range.length > 0) 
@@ -198,7 +200,9 @@ class ShortNameEmoji {
         } 
         const buttons = Array(emojis.length);
         this.buttons = buttons;
-        
+
+        // TODO - clw - update handler code to listen to quillEditor
+        // TODO - clw - add artificial focus to emoji buttons
         const handler = (i, emoji) => event => {
             if (event.key === "ArrowRight" || event.keyCode === 39) {
                 event.preventDefault();
@@ -253,7 +257,6 @@ class ShortNameEmoji {
         this.container.style.display = "block"; 
         //emoji palette on top
         if (this.quill.container.classList.contains('top-emoji')) {
-            // todo - clw - fix how we render the emoji auto complete
             /*let x = this.container.querySelectorAll("li");
                 let i;
                 for (i = 0; i < x.length; i++) {
