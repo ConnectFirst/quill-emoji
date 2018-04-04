@@ -139,6 +139,7 @@ function fn_emojiElementsToPanel(type,panel,quill){
                 quill.insertText(range.index, customButton.innerHTML);
                 quill.setSelection(range.index + customButton.innerHTML.length, 0);
                 range.index = range.index + customButton.innerHTML.length;
+                fn_close();
             });
         };
     });
