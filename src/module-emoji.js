@@ -48,6 +48,22 @@ Quill.register({
 
 class ShortNameEmoji {
     constructor(quill, props) {
+        this.quill = quill;
+        this.buildFuse();
+        this.assignProps(props);
+        this.createEmojiCompletions();
+
+        this.onSelectionChange  = this.maybeUnfocus.bind(this);
+        this.onTextChange       = this.update.bind(this);
+
+        this.open           = false;
+        this.atIndex        = null;
+        this.focusedButton  = null;
+
+        this.setupBindings();
+    }
+
+    buildFuse() {
         this.fuseOptions = {
             shouldSort: true,
             threshold: 0.1,
@@ -61,49 +77,48 @@ class ShortNameEmoji {
         };
         this.emojiList  = emojiList;
         this.fuse       = new Fuse(this.emojiList, this.fuseOptions);
-        
-        this.quill      = quill;
-        this.onClose    = props.onClose;
-        this.onOpen     = props.onOpen;
+    }
+
+    assignProps(props) {
+        this.onOpen = props.onOpen;
+        this.onClose = props.onClose;
+    }
+
+    createEmojiCompletions() {
         this.container  = document.createElement('ul');
         this.container.classList.add('emoji_completions');
-        this.quill.container.appendChild(this.container);
         this.container.style.position   = "absolute";
         this.container.style.display    = "none";
+        this.quill.container.appendChild(this.container);
+    }
 
-        this.onSelectionChange  = this.maybeUnfocus.bind(this);
-        this.onTextChange       = this.update.bind(this);
-
-        this.open           = false;
-        this.atIndex        = null;
-        this.focusedButton  = null;
-
-        this.isWhiteSpace = function(ch){
-            var whiteSpace = false;
-            if (/\s/.test(ch)) {
-                whiteSpace = true;
-            }
-            return whiteSpace;
-        }
-
-        quill.keyboard.addBinding({
+    setupBindings() {
+        this.quill.keyboard.addBinding({
             // TODO: Once Quill supports using event.key (#1091) use that instead of shift-2
             key: 186,  // 2
             shiftKey: true,
         }, this.onAtKey.bind(this));
 
-        quill.keyboard.addBinding({
+        this.quill.keyboard.addBinding({
             key: 39,  // ArrowRight
             collapsed: true,
             format: ["emoji"]
         }, this.handleArrow.bind(this));
 
-        quill.keyboard.addBinding({
+        this.quill.keyboard.addBinding({
             key: 40,  // ArrowDown
             collapsed: true,
             format: ["emoji"]
         }, this.handleArrow.bind(this));
         // TODO: Add keybindings for Enter (13) and Tab (9) directly on the quill editor
+    }
+
+    isWhiteSpace(ch) {
+        let whiteSpace = false;
+        if (/\s/.test(ch)) {
+            whiteSpace = true;
+        }
+        return whiteSpace;
     }
 
     // todo - clw - add emoji if we are closing a shorthand expression and it matches an emoji
