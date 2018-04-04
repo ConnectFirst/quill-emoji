@@ -3,7 +3,9 @@ import {emojiList} from '../src/emojiList.js';
 import Quill from "quill";
 
 const Delta = Quill.import('delta');
-const e = (tag, attrs, ...children) => {
+const Inline = Quill.import('blots/inline');
+
+function buildElement(tag, attrs, ...children) {
     const elem = document.createElement(tag);
     Object.keys(attrs).forEach(key => elem[key] = attrs[key]);
     children.forEach(child => {
@@ -12,8 +14,8 @@ const e = (tag, attrs, ...children) => {
         elem.appendChild(child);
     });
     return elem;
-};
-const Inline = Quill.import('blots/inline');
+}
+
 class EmojiBlot extends Inline {
     static create(unicode) {
         const node = super.create();
@@ -52,17 +54,10 @@ class ShortNameEmoji {
         this.buildFuse();
         this.assignProps(props);
         this.createEmojiCompletions();
-
-        this.onSelectionChange  = this.maybeUnfocus.bind(this);
-        this.onTextChange       = this.update.bind(this);
-
-        this.open           = false;
-        this.atIndex        = null;
-        this.focusedButton  = null;
-
         this.setupBindings();
     }
 
+    // region INITIALIZE ShortNameEmoji
     buildFuse() {
         this.fuseOptions = {
             shouldSort: true,
@@ -82,6 +77,9 @@ class ShortNameEmoji {
     assignProps(props) {
         this.onOpen = props.onOpen;
         this.onClose = props.onClose;
+        this.open = false;
+        this.atIndex = null;
+        this.focusedButton = null;
     }
 
     createEmojiCompletions() {
@@ -112,14 +110,7 @@ class ShortNameEmoji {
         }, this.handleArrow.bind(this));
         // TODO: Add keybindings for Enter (13) and Tab (9) directly on the quill editor
     }
-
-    isWhiteSpace(ch) {
-        let whiteSpace = false;
-        if (/\s/.test(ch)) {
-            whiteSpace = true;
-        }
-        return whiteSpace;
-    }
+    // endregion
 
     // todo - clw - add emoji if we are closing a shorthand expression and it matches an emoji
     // todo - clw - reopen emoji selector if we move the cursor away from an open shorthand expression and then back to it
@@ -154,8 +145,17 @@ class ShortNameEmoji {
         this.container.style.top = atSignBounds.top + atSignBounds.height + "px",
         this.open = true;
 
-        this.quill.on('text-change', this.onTextChange);
+        if (typeof this.onSelectionChange !== "function") {
+            this.onSelectionChange  = this.maybeUnfocus.bind(this);
+        }
+
         this.quill.once('selection-change', this.onSelectionChange);
+
+        if (typeof this.onTextChange !== "function") {
+            this.onTextChange = this.update.bind(this);
+        }
+        this.quill.on('text-change', this.onTextChange);
+
         this.update();
         this.onOpen && this.onOpen();
     }
@@ -166,7 +166,7 @@ class ShortNameEmoji {
         this.buttons[0].focus();
         if (this.buttons.length > 1) {
             this.buttons[1].focus();
-        };
+        }
     }
 
     getQueryInfo() {
@@ -184,6 +184,15 @@ class ShortNameEmoji {
         query = query.trim();
 
         return this.fuse.search(query);
+    }
+
+
+    isWhiteSpace(ch) {
+        let whiteSpace = false;
+        if (/\s/.test(ch)) {
+            whiteSpace = true;
+        }
+        return whiteSpace;
     }
 
     update() {
@@ -279,12 +288,10 @@ class ShortNameEmoji {
         };
 
         emojis.forEach((emoji, i) => {
-            const li =  e('li', {},
-                        e('button', {type: "button"},
-                        e("span", {className: "ico", innerHTML: emoji.code_decimal }),
-                        // e('span', {className: "matched"}, this.query),
-                        // e('span', {className: "unmatched"}, emoji.shortname.slice(this.query.length+1))
-                        e('span', {className: "unmatched"}, emoji.shortname),
+            const li =  buildElement('li', {},
+                        buildElement('button', {type: "button"},
+                        buildElement("span", {className: "ico", innerHTML: emoji.code_decimal }),
+                        buildElement('span', {className: "unmatched"}, emoji.shortname),
                         ));
             this.container.appendChild(li);
             buttons[i] = li.firstChild;
@@ -322,7 +329,7 @@ class ShortNameEmoji {
         this.quill.off('text-change', this.onTextChange);
         if (value) {
             const {name, unicode, shortname,code_decimal} = value;
-            let emoji_icon_html = e("span", {className: "ico", innerHTML: ' '+code_decimal+' ' });
+            let emoji_icon_html = buildElement("span", {className: "ico", innerHTML: ' '+code_decimal+' ' });
             let emoji_icon = emoji_icon_html.innerHTML;
             this.quill.deleteText(this.atIndex, this.query.length + 1, Quill.sources.USER);
             this.quill.insertText(this.atIndex, emoji_icon, "emoji", unicode, Quill.sources.USER);
@@ -336,7 +343,7 @@ class ShortNameEmoji {
     enterEmoji(value){
         if (value) {
             const {name, unicode, shortname,code_decimal} = value;
-            let emoji_icon_html = e("span", {className: "ico", innerHTML: ' '+code_decimal+' ' });
+            let emoji_icon_html = buildElement("span", {className: "ico", innerHTML: ' '+code_decimal+' ' });
             let emoji_icon = emoji_icon_html.innerHTML;
             let delta = new Delta();
             let currentText = this.quill.getSelection();
