@@ -1,4 +1,4 @@
-import Fuse from '../node_modules/fuse.js';
+import Fuse from 'fuse.js';
 import {emojiList} from '../src/emojiList.js';
 
 class TextAreaEmoji {
