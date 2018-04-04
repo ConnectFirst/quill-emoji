@@ -155,9 +155,12 @@ class ShortNameEmoji {
     }
 
     getQueryInfo() {
+        const sel = this.quill.getSelection().index;
+        const query = this.quill.getText(this.atIndex + 1, sel - this.atIndex - 1);
+
         return {
-            sel: this.quill.getSelection().index,
-            query: this.quill.getText(this.atIndex + 1, sel - this.atIndex - 1),
+            sel: sel,
+            query: query,
         };
     }
 
