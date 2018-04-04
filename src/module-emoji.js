@@ -109,7 +109,15 @@ class ShortNameEmoji {
     // todo - clw - add emoji if we are closing a shorthand expression and it matches an emoji
     // todo - clw - reopen emoji selector if we move the cursor away from an open shorthand expression and then back to it
     onAtKey(range, context) {
-        if (this.open) return true;
+        if (this.open) {
+            let emojis = this.getEmojisFromQuery();
+
+            if (emojis.length === 1) {
+                this.close(emojis[0]);
+            }
+
+            return true;
+        }
         if (range.length > 0) 
             this.quill.deleteText(range.index, range.length, Quill.sources.USER);
         
@@ -146,13 +154,28 @@ class ShortNameEmoji {
         };
     }
 
+    getQueryInfo() {
+        return {
+            sel: this.quill.getSelection().index,
+            query: this.quill.getText(this.atIndex + 1, sel - this.atIndex - 1),
+        };
+    }
+
+    getEmojisFromQuery() {
+        let {sel, query} = this.getQueryInfo();
+        query = query.trim();
+
+        return this.fuse.search(query);
+    }
+
     update() {
-        const sel = this.quill.getSelection().index;
+        const {sel, query} = this.getQueryInfo();
+
         if (this.atIndex >= sel) { // Deleted the at character
             return this.close(null);
         }
         //Using: fuse.js
-        this.query = this.quill.getText(this.atIndex + 1, sel - this.atIndex - 1);
+        this.query = query;
         if(!event && this.isWhiteSpace(this.query)){
             this.close(null);
             return;
