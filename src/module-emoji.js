@@ -252,11 +252,12 @@ class ShortNameEmoji {
         this.container.style.display = "block"; 
         //emoji palette on top
         if (this.quill.container.classList.contains('top-emoji')) {
-            let x = this.container.querySelectorAll("li");
+            // todo - clw - fix how we render the emoji auto complete
+            /*let x = this.container.querySelectorAll("li");
                 let i;
                 for (i = 0; i < x.length; i++) {
                     x[i].style.display = 'block';
-                }
+                }*/
             
             let windowHeight = window.innerHeight;
             let editorPos = this.quill.container.getBoundingClientRect().top;
