@@ -146,4 +146,4 @@ function fn_emojiElementsToPanel(type,panel,quill){
 }
 
 Quill.register('modules/textarea_emoji', TextAreaEmoji);
-export { TextAreaEmoji as textAreaEmoji};
+export default TextAreaEmoji;

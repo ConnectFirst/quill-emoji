@@ -182,4 +182,4 @@ function fn_updateEmojiContainer(emojiFilter,panel,quill){
 }
 
 Quill.register('modules/toolbar_emoji', ToolbarEmoji);
-export { ToolbarEmoji as toolbarEmoji};
+export default ToolbarEmoji;
