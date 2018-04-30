@@ -1,5 +1,6 @@
-import Fuse from '../node_modules/fuse.js';
+import Fuse from 'fuse.js';
 import {emojiList} from '../src/emojiList.js';
+import Quill from "quill";
 
 class TextAreaEmoji {
     constructor(quill){
@@ -61,7 +62,7 @@ class TextAreaEmoji {
                 tabElementHolder.appendChild(tabElement);
                 let emojiFilter = document.querySelector('.filter-'+emojiType.name);
                 emojiFilter.addEventListener('click',function(){ 
-                    let tab = document.querySelector('.active');
+                    let tab = document.querySelector('.emoji-tab.active');
                     if (tab) {
                         tab.classList.remove('active');
                     };
@@ -138,10 +139,11 @@ function fn_emojiElementsToPanel(type,panel,quill){
                 quill.insertText(range.index, customButton.innerHTML);
                 quill.setSelection(range.index + customButton.innerHTML.length, 0);
                 range.index = range.index + customButton.innerHTML.length;
+                fn_close();
             });
         };
     });
 }
 
 Quill.register('modules/textarea_emoji', TextAreaEmoji);
-export { TextAreaEmoji as textAreaEmoji};
+export default TextAreaEmoji;

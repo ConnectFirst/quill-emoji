@@ -1,5 +1,6 @@
-import Fuse from '../node_modules/fuse.js';
+import Fuse from 'fuse.js';
 import {emojiList} from '../src/emojiList.js';
+import Quill from "quill";
 
 class ToolbarEmoji {
     constructor(quill){
@@ -181,4 +182,4 @@ function fn_updateEmojiContainer(emojiFilter,panel,quill){
 }
 
 Quill.register('modules/toolbar_emoji', ToolbarEmoji);
-export { ToolbarEmoji as toolbarEmoji};
+export default ToolbarEmoji;

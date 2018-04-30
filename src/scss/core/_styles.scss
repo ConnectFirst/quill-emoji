@@ -1,4 +1,4 @@
-@import 'core/variables'; /* sass-loader doesnt like absolute imports*/
+@import './_variables'; /* sass-loader doesnt like absolute imports*/
 
 body {
   background: $white;
@@ -45,7 +45,7 @@ body {
     color: black;
 }
 .completions > li > button > * {
-    vertical-align: "middle";
+    vertical-align: middle;
 }
 .emoji_completions {
     list-style: none;
@@ -100,7 +100,7 @@ body {
             font-weight: bold;
 }
 .emoji_completions > li > button > * {
-            vertical-align: "middle";
+            vertical-align: middle;
 }
 
 .ico {
